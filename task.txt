@@ -1,0 +1,14 @@
+Day 1:
+Set up development environment (Node.js, npm, Git), Create a basic Node.js “Hello World” server, Understand CommonJS vs ES Modules
+Day 2:
+Initialize an Express.js app, Create basic routes:( /, /health, /api/test)
+Day 3:
+Understand middleware, Implement custom middleware: Request logging, Response time tracking
+Day 4:
+Design REST APIs, Implement CRUD APIs for a sample resource (Users – in-memory)
+Day 5:
+Use Postman for API testing, Document APIs (request/response formats)
+Day 6:
+ Implement proper folder structure (routes, controllers, services, utils).
+Day 7:
+Environment variables & configuration using dotenv, Config separation (dev, test, prod)
