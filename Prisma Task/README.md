@@ -8,12 +8,14 @@ A professional Node.js Express application demonstrating PostgreSQL database int
 Prisma Task/
 ├── src/
 │   ├── config/
-│   │   └── database.js          # Prisma Client instance
+│   │   └── database.js          # Enhanced Prisma Client with logging
 │   ├── controllers/
-│   │   ├── user.controller.js   # User business logic
-│   │   ├── role.controller.js   # Role business logic
-│   │   ├── post.controller.js   # Post business logic
-│   │   └── userRole.controller.js # User-Role assignment logic
+│   │   ├── user.controller.js   # User HTTP request handlers
+│   │   ├── role.controller.js   # Role HTTP request handlers
+│   │   ├── post.controller.js   # Post HTTP request handlers
+│   │   └── userRole.controller.js # User-Role assignment handlers
+│   ├── services/
+│   │   └── user.service.js      # User database operations layer
 │   ├── routes/
 │   │   ├── index.js             # Main router
 │   │   ├── user.routes.js       # User routes
@@ -37,12 +39,15 @@ Prisma Task/
 ## ✅ Features
 
 - ✅ **Professional Architecture**: MVC-like pattern with separation of concerns
+- ✅ **Service Layer Pattern**: Database operations separated from HTTP handlers
 - ✅ **PostgreSQL Database**: Relational database with Prisma ORM
+- ✅ **Enhanced Prisma Client**: Query logging, error handling, and connection management
 - ✅ **Role-Based Access Control**: User and Role models with many-to-many relationship
 - ✅ **RESTful API**: Clean API design with proper HTTP methods
+- ✅ **Pagination & Filtering**: Built-in support for search, sorting, and pagination
 - ✅ **Error Handling**: Centralized error handling middleware
 - ✅ **Type-Safe Queries**: Prisma Client for type-safe database operations
-- ✅ **Modular Code**: Separated routes, controllers, and configuration
+- ✅ **Modular Code**: Separated routes, controllers, services, and configuration
 
 ## 📋 Prerequisites
 
@@ -122,7 +127,15 @@ All API endpoints are prefixed with `/api`
 - `GET /` - Test database connection
 
 ### Users
-- `GET /api/users` - Get all users (with roles and posts)
+- `GET /api/users` - Get all users (with pagination, search, and sorting)
+  - **Query Parameters**:
+    - `page` (default: 1) - Page number
+    - `limit` (default: 10) - Items per page
+    - `search` - Search by name or email
+    - `sortBy` (default: 'createdAt') - Field to sort by
+    - `sortOrder` (default: 'desc') - Sort order: 'asc' or 'desc'
+  - **Example**: `/api/users?page=1&limit=5&search=john&sortBy=email&sortOrder=asc`
+
 - `POST /api/users` - Create user (with optional role assignment)
   ```json
   {
@@ -132,7 +145,10 @@ All API endpoints are prefixed with `/api`
     "roleIds": [1, 2]  // Optional
   }
   ```
+  - **Response**: Returns created user with success message
+
 - `GET /api/users/:id` - Get user by ID (with roles and posts)
+  - **Response**: Returns user object with success flag
 
 ### Roles
 - `GET /api/roles` - Get all roles (with users)
@@ -171,26 +187,60 @@ All API endpoints are prefixed with `/api`
 
 ## 🧪 Testing Examples
 
-### Create a Role
+### 1. Create a Role
 ```bash
 curl -X POST http://localhost:3000/api/roles \
   -H "Content-Type: application/json" \
   -d '{"roleName":"Admin","description":"Administrator"}'
 ```
 
-### Create a User with Role
+### 2. Create a User (without roles)
+```bash
+curl -X POST http://localhost:3000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john@example.com","name":"John Doe","password":"password123"}'
+```
+
+### 3. Create a User with Roles
 ```bash
 curl -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@example.com","name":"Admin User","password":"admin123","roleIds":[1]}'
 ```
 
-### Get All Users
+### 4. Get All Users (with pagination)
 ```bash
+# Get first page with 10 users
 curl http://localhost:3000/api/users
+
+# Get second page with 5 users per page
+curl "http://localhost:3000/api/users?page=2&limit=5"
 ```
 
-### Assign Role to User
+### 5. Search Users
+```bash
+# Search by name or email
+curl "http://localhost:3000/api/users?search=john"
+
+# Search with pagination
+curl "http://localhost:3000/api/users?search=admin&page=1&limit=10"
+```
+
+### 6. Sort Users
+```bash
+# Sort by email ascending
+curl "http://localhost:3000/api/users?sortBy=email&sortOrder=asc"
+
+# Sort by creation date descending (default)
+curl "http://localhost:3000/api/users?sortBy=createdAt&sortOrder=desc"
+```
+
+### 7. Get User by ID
+```bash
+curl http://localhost:3000/api/users/1
+```
+
+### 8. Assign Role to User
 ```bash
 curl -X POST http://localhost:3000/api/users/1/roles \
   -H "Content-Type: application/json" \
@@ -221,12 +271,25 @@ npx prisma format
 
 ## 🏛️ Architecture Benefits
 
-- **Separation of Concerns**: Routes, controllers, and config are separated
+### Service Layer Pattern
+- **Separation of Concerns**: Controllers handle HTTP, services handle database operations
+- **Reusability**: Service methods can be used across multiple controllers
+- **Testability**: Services can be unit tested independently without HTTP context
+- **Maintainability**: Business logic centralized in one place
+- **Single Responsibility**: Each layer has a clear, focused purpose
+
+### Overall Architecture
 - **Scalability**: Easy to add new features and endpoints
-- **Maintainability**: Code is organized and easy to navigate
-- **Testability**: Controllers can be unit tested independently
-- **Reusability**: Middleware and utilities can be reused
+- **Modularity**: Code is organized into logical folders
+- **Error Handling**: Centralized error handling with async wrapper
+- **Type Safety**: Prisma provides type-safe database queries
 - **Industry Standard**: Follows common Node.js/Express patterns
+
+### Enhanced Prisma Client
+- **Query Logging**: See all database queries in development mode
+- **Error Tracking**: Automatic error logging for debugging
+- **Connection Management**: Graceful connection handling and shutdown
+- **Performance Monitoring**: Query duration tracking
 
 ## 📚 Learn More
 
