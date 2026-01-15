@@ -150,6 +150,21 @@ All API endpoints are prefixed with `/api`
 - `GET /api/users/:id` - Get user by ID (with roles and posts)
   - **Response**: Returns user object with success flag
 
+- `PATCH /api/users/:id` - Update user by ID (partial update)
+  ```json
+  {
+    "email": "newemail@example.com",
+    "name": "Updated Name",
+    "password": "newpassword123"
+  }
+  ```
+  - **Note**: All fields are optional, update only what you need
+  - **Response**: Returns updated user with success message
+
+- `DELETE /api/users/:id` - Delete user by ID
+  - **Response**: Returns success message with deleted user info
+  - **Note**: Cascade deletion removes related posts and roles
+
 ### Roles
 - `GET /api/roles` - Get all roles (with users)
 - `POST /api/roles` - Create role
@@ -240,7 +255,25 @@ curl "http://localhost:3000/api/users?sortBy=createdAt&sortOrder=desc"
 curl http://localhost:3000/api/users/1
 ```
 
-### 8. Assign Role to User
+### 8. Update User
+```bash
+# Partial update (only name)
+curl -X PATCH http://localhost:3000/api/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Updated"}'
+
+# Full update
+curl -X PATCH http://localhost:3000/api/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john.new@example.com","name":"John New","password":"newpass123"}'
+```
+
+### 9. Delete User
+```bash
+curl -X DELETE http://localhost:3000/api/users/1
+```
+
+### 10. Assign Role to User
 ```bash
 curl -X POST http://localhost:3000/api/users/1/roles \
   -H "Content-Type: application/json" \
@@ -285,11 +318,40 @@ npx prisma format
 - **Type Safety**: Prisma provides type-safe database queries
 - **Industry Standard**: Follows common Node.js/Express patterns
 
+### Enhanced Error Handling
+- **Prisma Errors**: Handles P2002 (unique constraint), P2025 (not found), and more
+- **HTTP Status Codes**: Proper status codes (400, 404, 409, 500)
+- **User-Friendly Messages**: Clear error messages for clients
+- **Development Mode**: Detailed stack traces and error info
+
 ### Enhanced Prisma Client
 - **Query Logging**: See all database queries in development mode
 - **Error Tracking**: Automatic error logging for debugging
 - **Connection Management**: Graceful connection handling and shutdown
 - **Performance Monitoring**: Query duration tracking
+
+## 🧪 Postman Testing
+
+A comprehensive Postman collection is included: `Prisma_CRUD_APIs.postman_collection.json`
+
+### Import Collection
+1. Open Postman
+2. Click **Import**
+3. Select `Prisma_CRUD_APIs.postman_collection.json`
+4. Collection includes 16 test scenarios with automated tests
+
+### Test Scenarios Included
+- ✅ Create user (valid, missing fields, duplicate email)
+- ✅ Get all users (default, pagination, search, sorting)
+- ✅ Get user by ID (valid, invalid)
+- ✅ Update user (partial, full, invalid ID)
+- ✅ Delete user (valid, invalid, verification)
+
+### Running Tests
+1. Ensure server is running: `npm start`
+2. Run collection in Postman
+3. View test results in Test Results tab
+4. Verify database changes: `npx prisma studio`
 
 ## 📚 Learn More
 

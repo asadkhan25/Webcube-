@@ -78,3 +78,49 @@ export const getUserById = asyncHandler(async (req, res) => {
         data: user
     });
 });
+
+
+// @desc    Update user by ID
+// @route   PATCH /api/users/:id
+// @access  Public
+export const updateUser = asyncHandler(async (req, res) => {
+    const { email, name, password } = req.body;
+
+    // Validate that at least one field is provided
+    if (!email && !name && !password) {
+        res.status(400);
+        throw new Error('At least one field (email, name, or password) is required for update');
+    }
+
+    // Update user using service
+    const updatedUser = await userService.updateUser(req.params.id, {
+        email,
+        name,
+        password
+    });
+
+    res.json({
+        success: true,
+        message: 'User updated successfully',
+        data: updatedUser
+    });
+});
+
+
+// @desc    Delete user by ID
+// @route   DELETE /api/users/:id
+// @access  Public
+export const deleteUser = asyncHandler(async (req, res) => {
+    // Delete user using service
+    const deletedUser = await userService.deleteUser(req.params.id);
+
+    res.json({
+        success: true,
+        message: 'User deleted successfully',
+        data: {
+            id: deletedUser.id,
+            email: deletedUser.email,
+            name: deletedUser.name
+        }
+    });
+});

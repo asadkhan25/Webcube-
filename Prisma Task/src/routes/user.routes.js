@@ -2,7 +2,9 @@ import express from 'express';
 import {
     getAllUsers,
     createUser,
-    getUserById
+    getUserById,
+    updateUser,
+    deleteUser
 } from '../controllers/user.controller.js';
 
 const router = express.Router();
@@ -12,6 +14,8 @@ router.route('/')
     .post(createUser);
 
 router.route('/:id')
-    .get(getUserById);
+    .get(getUserById)
+    .patch(updateUser)
+    .delete(deleteUser);
 
 export default router;
